@@ -1,5 +1,5 @@
 import { BlogRouteController, Route } from './router.js';
-import { LitElement, css, html, unsafeHTML, marked } from '/src/lib.js';
+import { LitElement, css, html, unsafeHTML, marked } from './lib.js';
 
 const genRoute = (path, filename) => new Route(path, async () => {
     let response = await fetch(`/posts/${filename}.md`);

@@ -1,6 +1,6 @@
 // super simple router, just for managing the blog page
 
-import { frontmatter } from "/src/frontmatter.js";
+import { frontmatter } from "./frontmatter.js";
 
 export class Route {
     load;
@@ -35,13 +35,13 @@ export class BlogRouteController {
 
         const url = new URL(event.destination.url);
         let params = url.searchParams;
-        let articlePath = '/posts/404.md';
+        let articlePath = '/blog/posts/404.md';
         if (params.size === 0) {
             // load the index
-            articlePath = '/posts/index.md';
+            articlePath = '/blog/posts/index.md';
         } else {
             let articleParam = params.get("article");
-            if(articleParam) articlePath = `/posts/${articleParam}.md`;
+            if(articleParam) articlePath = `/blog/posts/${articleParam}.md`;
         }
 
         const route = this.routes.find((route) => route.path === url.pathname);
@@ -65,7 +65,7 @@ export class BlogRouteController {
                         const content = await response.text();
                         setContent(content);
                     } catch {
-                        const response = await fetch('/posts/404.md');
+                        const response = await fetch('/blog/posts/404.md');
                         const content = await response.text();
                         setContent(content);
                     }
