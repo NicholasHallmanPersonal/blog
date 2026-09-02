@@ -43,8 +43,8 @@ class Blog extends LitElement {
     constructor() {
         super();
         let routes = [
-            genRoute('/', 'index'),
-            genRoute('/?article=test', 'test'),
+            genRoute('/blog/', 'index'),
+            genRoute('/blog/?article=test', 'test'),
         ];
         this.router = new BlogRouteController(this, routes);
     }
