@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>title</title>
+    <script>
+        let path = window.location.pathname.substring(1);
+        console.log(path);
+        let url = new URL('/', window.location.origin);
+        url.searchParams.append('article', path);
+        window.location.replace(url);
+    </script>
+</head>
+</html>
