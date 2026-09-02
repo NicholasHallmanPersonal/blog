@@ -52,8 +52,8 @@ class Blog extends LitElement {
     render() {
         return html`
             <div class="header">
-                <a href="/">Blog</a>
-                <a href="/featured">Featured</a>
+                <a href="/blog/">Blog</a>
+                <a href="/blog/featured">Featured</a>
             </div>
             <article>
                 <h1>${this.router.meta?.title}</h1>
