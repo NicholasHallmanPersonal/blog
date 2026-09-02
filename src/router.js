@@ -12,11 +12,10 @@ export class Route {
 }
 
 export class BlogRouteController {
-    constructor(host, routes) {
+    constructor(host) {
         this.host = host;
         host.addController(this);
         this.navigation = window.navigation;
-        this.routes = routes;
         this.content = "";
 
         this.navigation.addEventListener('navigate', this.handleNavigationEvent.bind(this));
@@ -44,8 +43,6 @@ export class BlogRouteController {
             if(articleParam) articlePath = `/blog/posts/${articleParam}.md`;
         }
 
-        const route = this.routes.find((route) => route.path === url.pathname);
-
         let setContent = (raw) => {
             const {content, meta} = frontmatter(raw);
             this.content = content;
@@ -53,24 +50,23 @@ export class BlogRouteController {
             (meta, content);
             this.host.requestUpdate();
         }
-        if (route) {
-            event.intercept({
-                async handler() {
-                    // replace our content with the content of the route
-                    try {
-                        const response = await fetch(articlePath);
-                        if (response.status === 404) {
-                            throw new Error("mising");
-                        }
-                        const content = await response.text();
-                        setContent(content);
-                    } catch {
-                        const response = await fetch('/blog/posts/404.md');
-                        const content = await response.text();
-                        setContent(content);
+
+        event.intercept({
+            async handler() {
+                // replace our content with the content of the route
+                try {
+                    const response = await fetch(articlePath);
+                    if (response.status === 404) {
+                        throw new Error("mising");
                     }
+                    const content = await response.text();
+                    setContent(content);
+                } catch {
+                    const response = await fetch('/blog/posts/404.md');
+                    const content = await response.text();
+                    setContent(content);
                 }
-            });
-        }
+            }
+        });
     }
 }
