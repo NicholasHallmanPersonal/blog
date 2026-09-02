@@ -1,0 +1,7 @@
+# Welcome
+
+Hi I'm Nicholas Hallman and I'm using this blog as an opertunity to practice technical writing. I'm a senior software developer and I've always thought of writing as a skill that was too difficult for me to learn or too late anyway. I didn't care much for it in highschool but I always enjoyed giving presentations. Saying my words always made them appear more convincing. Of course, this only gets you so far. I can't be in ever room, heck I don't want to be in every room, but I still need my ideas to travel. Working on my writing skills will make me a better presenter as well, give my stories better structure, more impactful conclusion, and organize my thoughts in a way I couldn't before this. So I have a lot of reasons to learn to write better and it's going to be rought to start. This intro is probably not that great, I'm starting it right at the beggining of this writing journey. A stream of consiousness mess to anchor my progress. 
+
+Well, that's that. I'm hoping to have a few interesting this to share here. Some of this will just be practice and pretty boring and I'll likely need some kind of system to hide those posts, maybe a private folder... Again, thinking in real time here.
+
+Enough of this already, till later.
