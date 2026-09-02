@@ -1,3 +1,3 @@
 # Featured
 
- - [About The Blog](/about-the-blog)
+ - [About The Blog](/blog/?article=about-the-blog)

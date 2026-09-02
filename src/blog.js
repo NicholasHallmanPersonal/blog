@@ -44,7 +44,6 @@ class Blog extends LitElement {
         super();
         let routes = [
             genRoute('/blog/', 'index'),
-            genRoute('/blog/?article=test', 'test'),
         ];
         this.router = new BlogRouteController(this, routes);
     }
@@ -53,7 +52,7 @@ class Blog extends LitElement {
         return html`
             <div class="header">
                 <a href="/blog/">Blog</a>
-                <a href="/blog/featured">Featured</a>
+                <a href="/blog/?article=featured">Featured</a>
             </div>
             <article>
                 <h1>${this.router.meta?.title}</h1>
