@@ -16,7 +16,7 @@ class Blog extends LitElement {
             font-family: "Merriweather", serif; 
         }
         .header {
-            width: 100%;
+            width: calc(100% - 20px);
             height: 40px;
             display: flex;
             flex-direction: row;
