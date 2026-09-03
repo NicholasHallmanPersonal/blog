@@ -33,6 +33,9 @@ class Blog extends LitElement {
         }
 
         code {
+            font-family: "IBM Plex Mono", monospace;
+            font-weight: 400;
+            font-style: normal;
             color: white;
             background-color: rgba(23, 63, 92, 255);
             padding-inline: 3px;
