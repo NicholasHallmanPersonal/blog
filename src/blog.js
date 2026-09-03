@@ -18,12 +18,17 @@ class Blog extends LitElement {
             font-family: "Merriweather", serif; 
         }
         .header {
+            position: sticky;
+            z-index: 999;
+            top: 0px;
+            backdrop-filter: blur(3px);
             width: calc(100% - 20px);
             height: 40px;
             display: flex;
             flex-direction: row;
-            border-bottom: solid 1px black;
+            border-bottom: solid 1px white;
             align-items: center;
+            justify-content: space-between;
             padding-inline: 10px;
             gap: 10px;
         }
@@ -34,6 +39,13 @@ class Blog extends LitElement {
             width: calc(100% - 20px);
             padding-inline: 10px;
             margin-inline: auto;
+        }
+
+        .categories {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            align-items: center;
         }
 
         code {
@@ -73,7 +85,10 @@ class Blog extends LitElement {
         return html`
             <div class="header">
                 <a href="/">Blog</a>
-                <a href="/?article=featured">Featured</a>
+                <div class="categories">
+                    <a href="/?article=featured">Featured</a>
+                    <a href="/?article=frontend">Frontend</a>
+                </div>
             </div>
             ${this.#renderShaderHero(this.router.meta?.shaderHeroCode)}
             <article>
@@ -90,19 +105,23 @@ class Blog extends LitElement {
     } 
 
     updated() {
-        super.firstUpdated();
+        super.updated();
 
         let image = this.router?.meta?.shaderHeroCode;
-        if (!image) return;
+        if (!image) {
+            this.toy?.cleanup();
+            this.toy = undefined;
+            return;
+        }
         let canvas = this.shadowRoot.querySelector('#hero');
         let article = this.shadowRoot.querySelector('article');
         // multiply by 2 for super sampling
         canvas.width = (article.getBoundingClientRect().width + 20) * 2;
         canvas.height = canvas.getBoundingClientRect().height * 2;
-        var toy = new ShaderToyLite(canvas);
-        toy.setCommon('');
-        toy.setImage({source: image});
-        toy.play();
+        this.toy = new ShaderToyLite(canvas);
+        this.toy.setCommon('');
+        this.toy.setImage({source: image});
+        this.toy.play();
     }
 }
 

@@ -1,4 +1,3 @@
-// https://github.com/chipweinberger/ShaderToyLite.js/tree/main                                       
 function ShaderToyLite(canvas) {
 
     var hdr = 
@@ -100,6 +99,17 @@ function ShaderToyLite(canvas) {
     var flip = {};      // a b flip
     var quadBuffer;     // two full screen triangles
 
+    // NEW: handles we need to hold onto so cleanup() can actually tear
+    // things down. The original code attached these with anonymous
+    // functions/never stored the resize listener, so none of it could be
+    // removed later.
+    var rafId = null;
+    var resizeHandler = null;
+    var mouseMoveHandler = null;
+    var mouseDownHandler = null;
+    var mouseUpHandler = null;
+    var destroyed = false;
+
     
     var setup = () => {
         gl.getExtension( 'OES_texture_float_linear');
@@ -128,27 +138,34 @@ function ShaderToyLite(canvas) {
         
         // Set viewport size
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    
-        window.addEventListener('resize', function() {
+
+        // CHANGED: named + stored so cleanup() can removeEventListener it.
+        // (left the resize behavior itself exactly as you have it now)
+        resizeHandler = function() {
             gl.canvas.width = canvas.width;
             gl.canvas.height = canvas.height;
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        });
-    
-        canvas.addEventListener("mousemove", (event) => {
+        };
+        window.addEventListener('resize', resizeHandler);
+
+        // CHANGED: named + stored so cleanup() can removeEventListener them
+        mouseMoveHandler = (event) => {
             iMouse.x = event.offsetX;
             iMouse.y = canvas.height - event.offsetY;
-        });
+        };
+        canvas.addEventListener("mousemove", mouseMoveHandler);
     
-        canvas.addEventListener("mousedown", (event) => {
+        mouseDownHandler = (event) => {
             iMouse.clickX = event.offsetX;
             iMouse.clickY = canvas.height - event.offsetY;
-        });
+        };
+        canvas.addEventListener("mousedown", mouseDownHandler);
     
-        canvas.addEventListener("mouseup", () => {
+        mouseUpHandler = () => {
             iMouse.clickX = 0;
             iMouse.clickY = 0;
-        });
+        };
+        canvas.addEventListener("mouseup", mouseUpHandler);
     }
     
     var createTexture = () => {
@@ -254,6 +271,9 @@ function ShaderToyLite(canvas) {
     };
     
     var draw = () => {
+
+        // NEW: guard against a stray frame landing after cleanup()
+        if (destroyed) return;
     
         // current time
         var now = isPlaying ? Date.now() : prevDrawTime;
@@ -347,7 +367,7 @@ function ShaderToyLite(canvas) {
     var animate = () => {
         if (isPlaying) {
             draw();
-            requestAnimationFrame(animate);
+            rafId = requestAnimationFrame(animate); // CHANGED: capture id for cleanup()
         }
     };
     
@@ -420,6 +440,76 @@ function ShaderToyLite(canvas) {
             animate();
         }
     }
+
+    // NEW: call this when you navigate away from / tear down the canvas.
+    // Frees every GPU resource this instance allocated and detaches every
+    // listener it registered, then force-releases the WebGL context itself
+    // so the browser doesn't have to wait on GC to reclaim it. Without the
+    // explicit loseContext() call, contexts and their GPU memory can hang
+    // around long enough that repeated navigation runs into the browser's
+    // concurrent-context limit -- which is the likely source of the lag
+    // you're seeing.
+    this.cleanup = () => {
+        if (destroyed) return;
+        destroyed = true;
+
+        // stop the render loop
+        this.pause();
+        if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+
+        // detach listeners
+        if (resizeHandler) {
+            window.removeEventListener('resize', resizeHandler);
+            resizeHandler = null;
+        }
+        if (mouseMoveHandler) {
+            canvas.removeEventListener('mousemove', mouseMoveHandler);
+            mouseMoveHandler = null;
+        }
+        if (mouseDownHandler) {
+            canvas.removeEventListener('mousedown', mouseDownHandler);
+            mouseDownHandler = null;
+        }
+        if (mouseUpHandler) {
+            canvas.removeEventListener('mouseup', mouseUpHandler);
+            mouseUpHandler = null;
+        }
+        onDrawCallback = null;
+
+        if (gl) {
+            // delete per-pass GPU objects
+            ['A', 'B', 'C', 'D', 'Image'].forEach((key) => {
+                if (program[key]) {
+                    gl.getAttachedShaders(program[key]).forEach((shader) => gl.deleteShader(shader));
+                    gl.deleteProgram(program[key]);
+                    program[key] = null;
+                }
+                if (key !== 'Image') {
+                    if (atexture[key]) { gl.deleteTexture(atexture[key]); atexture[key] = null; }
+                    if (btexture[key]) { gl.deleteTexture(btexture[key]); btexture[key] = null; }
+                    if (aframebuf[key]) { gl.deleteFramebuffer(aframebuf[key]); aframebuf[key] = null; }
+                    if (bframebuf[key]) { gl.deleteFramebuffer(bframebuf[key]); bframebuf[key] = null; }
+                }
+            });
+
+            if (quadBuffer) {
+                gl.deleteBuffer(quadBuffer);
+                quadBuffer = null;
+            }
+
+            // force immediate release of the GPU-side context rather than
+            // waiting on garbage collection
+            var loseContextExt = gl.getExtension('WEBGL_lose_context');
+            if (loseContextExt) {
+                loseContextExt.loseContext();
+            }
+        }
+
+        gl = null;
+    };
     
     setup();
 }
