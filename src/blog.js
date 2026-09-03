@@ -41,6 +41,11 @@ class Blog extends LitElement {
             padding-inline: 3px;
             border-radius: 3px;
         }
+
+        iframe.hero {
+            max-width: 700px;
+            height: 300px;
+        }
     `;
 
     constructor() {
@@ -58,11 +63,18 @@ class Blog extends LitElement {
                 <a href="/?article=featured">Featured</a>
             </div>
             <article>
+                ${this.#renderShaderHero(this.router.meta?.shaderHero)}
                 <h1>${this.router.meta?.title}</h1>
                 ${unsafeHTML(marked.parse(this.router.content))}
             </article>
         `;
     }
+
+    #renderShaderHero(hero) {
+        if (!hero) return html``;
+
+        return html`<iframe class="hero" width="100%" height="100%" frameborder="0" src="${hero}"></iframe>`
+    } 
 }
 
 customElements.define("n-blog", Blog);

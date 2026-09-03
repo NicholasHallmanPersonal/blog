@@ -1,7 +1,8 @@
 ---
 {
     "title": "Nick's Blog",
-    "tags": []
+    "tags": [],
+    "shaderHero": "https://www.shadertoy.com/embed/dtccWB?gui=true&t=10&paused=true&muted=false"
 }
 ---
 
