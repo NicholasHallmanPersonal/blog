@@ -11,6 +11,8 @@ class Blog extends LitElement {
     static styles = css`
         :host {
             font-family: "Open Sans", sans-serif;
+            display: flex;
+            flex-direction: column;
         }
         h1, h2, h3, h4, h5, h6 {
             font-family: "Merriweather", serif; 
@@ -28,6 +30,8 @@ class Blog extends LitElement {
 
         article {
             max-width: 700px;
+            min-width: 300px;
+            width: calc(100% - 20px);
             padding-inline: 10px;
             margin-inline: auto;
         }
@@ -42,9 +46,16 @@ class Blog extends LitElement {
             border-radius: 3px;
         }
 
-        iframe.hero {
-            max-width: 700px;
-            height: 300px;
+        canvas#hero {
+            max-width: 720px;
+            height: 200px;
+            margin-inline: auto;
+            overflow: hidden;
+        }
+
+        .move-up {
+            margin-top: -45px;
+            color: white;
         }
     `;
 
@@ -57,14 +68,15 @@ class Blog extends LitElement {
     }
 
     render() {
+        const hasHero = !!this.router.meta?.shaderHeroCode
         return html`
             <div class="header">
                 <a href="/">Blog</a>
                 <a href="/?article=featured">Featured</a>
             </div>
+            ${this.#renderShaderHero(this.router.meta?.shaderHeroCode)}
             <article>
-                ${this.#renderShaderHero(this.router.meta?.shaderHero)}
-                <h1>${this.router.meta?.title}</h1>
+                <h1 class="${hasHero ? 'move-up' : ''}">${this.router.meta?.title}</h1>
                 ${unsafeHTML(marked.parse(this.router.content))}
             </article>
         `;
@@ -73,8 +85,24 @@ class Blog extends LitElement {
     #renderShaderHero(hero) {
         if (!hero) return html``;
 
-        return html`<iframe class="hero" width="100%" height="100%" frameborder="0" src="${hero}"></iframe>`
+        return html`<canvas width="100%" height="100%" id="hero"></canvas>`
     } 
+
+    updated() {
+        super.firstUpdated();
+
+        let image = this.router?.meta?.shaderHeroCode;
+        if (!image) return;
+        let canvas = this.shadowRoot.querySelector('#hero');
+        let article = this.shadowRoot.querySelector('article');
+        // multiply by 2 for super sampling
+        canvas.width = (article.getBoundingClientRect().width + 20) * 2;
+        canvas.height = canvas.getBoundingClientRect().height * 2;
+        var toy = new ShaderToyLite(canvas);
+        toy.setCommon('');
+        toy.setImage({source: image});
+        toy.play();
+    }
 }
 
 customElements.define("n-blog", Blog);
