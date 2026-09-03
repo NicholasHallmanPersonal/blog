@@ -21,7 +21,8 @@ class Blog extends LitElement {
             position: sticky;
             z-index: 999;
             top: 0px;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(5px);
+            background-color: rgba(255,255,255,.4);
             width: calc(100% - 20px);
             height: 40px;
             display: flex;
@@ -31,6 +32,10 @@ class Blog extends LitElement {
             justify-content: space-between;
             padding-inline: 10px;
             gap: 10px;
+        }
+
+        .header a {
+            color: black;
         }
 
         article {
