@@ -48,6 +48,7 @@ class Blog extends LitElement {
 
         canvas#hero {
             max-width: 720px;
+            width: 100%;
             height: 200px;
             margin-inline: auto;
             overflow: hidden;
