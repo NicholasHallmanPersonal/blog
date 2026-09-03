@@ -34,13 +34,13 @@ export class BlogRouteController {
 
         const url = new URL(event.destination.url);
         let params = url.searchParams;
-        let articlePath = '/blog/posts/404.md';
+        let articlePath = '/posts/404.md';
         if (params.size === 0) {
             // load the index
-            articlePath = '/blog/posts/index.md';
+            articlePath = '/posts/index.md';
         } else {
             let articleParam = params.get("article");
-            if(articleParam) articlePath = `/blog/posts/${articleParam}.md`;
+            if(articleParam) articlePath = `/posts/${articleParam}.md`;
         }
 
         let setContent = (raw) => {
@@ -62,7 +62,7 @@ export class BlogRouteController {
                     const content = await response.text();
                     setContent(content);
                 } catch {
-                    const response = await fetch('/blog/posts/404.md');
+                    const response = await fetch('/posts/404.md');
                     const content = await response.text();
                     setContent(content);
                 }

@@ -4,8 +4,8 @@
     <meta charset="UTF-8"/>
     <title>title</title>
     <script>
-        let path = window.location.pathname.replace('/blog/', '');
-        let url = new URL('/blog/', window.location.origin);
+        let path = window.location.pathname.replace('/', '');
+        let url = new URL('/', window.location.origin);
         url.searchParams.append('article', path);
         window.location.replace(url);
     </script>
